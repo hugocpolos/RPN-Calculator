@@ -341,4 +341,57 @@ mod tests {
         process_command(&mut calc, "/");
         assert_eq!(calc.stack, [10.0, 0.0]);
     }
+
+    #[test]
+    fn cli_add_all_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1");
+        process_command(&mut calc, "2");
+        process_command(&mut calc, "3");
+        process_command(&mut calc, "4");
+        process_command(&mut calc, "5");
+        process_command(&mut calc, "++");
+        assert_eq!(calc.stack, [15.0]);
+    }
+
+    #[test]
+    fn cli_add_all_stack_2() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1");
+        process_command(&mut calc, "2");
+        process_command(&mut calc, "aa");
+        assert_eq!(calc.stack, [3.0]);
+    }
+
+    #[test]
+    fn cli_add_all_stack_3() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1");
+        process_command(&mut calc, "2");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "aa");
+        assert_eq!(calc.stack, [3.0]);
+    }
+
+    #[test]
+    fn cli_add_all_empty_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "++");
+        assert_eq!(calc.stack, []);
+    }
+
+    #[test]
+    fn cli_add_all_single_element_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1");
+        process_command(&mut calc, "++");
+        assert_eq!(calc.stack, [1.0]);
+    }
 }

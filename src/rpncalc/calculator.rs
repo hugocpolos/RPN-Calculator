@@ -8,6 +8,7 @@ pub fn process(c: &mut RpnCalc, cmd: CliCmd) {
         CliOperation::Subtract => subtract(c),
         CliOperation::Multiply => multiply(c),
         CliOperation::Divide => divide(c),
+        CliOperation::AddAll => add_all(c),
         CliOperation::Clear => clear(c),
         CliOperation::List => list(c),
         _ => {}
@@ -70,6 +71,17 @@ fn divide(c: &mut RpnCalc) {
     let divisor = c.stack.pop().unwrap();
     let dividend = c.stack.pop().unwrap();
     c.stack.push(dividend / divisor);
+    print_top(c);
+}
+
+fn add_all(c: &mut RpnCalc) {
+    if c.stack.is_empty() {
+        return;
+    }
+
+    let sum: f64 = c.stack.iter().sum();
+    clear(c);
+    c.stack.push(sum);
     print_top(c);
 }
 

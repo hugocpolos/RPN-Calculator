@@ -10,6 +10,7 @@ pub enum CliOperation {
     Subtract,
     Multiply,
     Divide,
+    AddAll,
     Clear,
     List,
     Quit,
@@ -39,6 +40,7 @@ impl CliCmd {
             "-" | "s" | "sub" => CliCmd::new_subtract_command(),
             "*" | "x" | "mul" => CliCmd::new_multiply_command(),
             "/" | "d" | "div" => CliCmd::new_divide_command(),
+            "++" | "aa" => CliCmd::new_add_all_command(),
             "c" | "clear" => CliCmd::new_clear_command(),
             "p" | "print" => CliCmd::new_list_command(),
             "h" | "help" => CliCmd::new_help_command(),
@@ -74,6 +76,12 @@ impl CliCmd {
     fn new_subtract_command() -> CliCmd {
         CliCmd {
             oper: CliOperation::Subtract,
+        }
+    }
+
+    fn new_add_all_command() -> CliCmd {
+        CliCmd {
+            oper: CliOperation::AddAll,
         }
     }
 
