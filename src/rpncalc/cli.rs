@@ -143,14 +143,16 @@ impl Cli {
             CliOperation::Quit => {}
             CliOperation::Help => {
                 println!("Commands:");
-                println!("  <number>\tPush a number to the stack");
-                println!("  + / a\t\tAdd the top two numbers from the stack");
-                println!("  - / s\t\tSubtract the top two number from the stack");
-                println!("  * / x\t\tMultiply the top two numbers from the stack");
-                println!("  / / d\t\tDivide the top two numbers from the stack");
-                println!("  print / p\tDisplay the stack");
-                println!("  help / h:\tDisplay this message");
-                println!("  quit / q:\tQuit the program");
+                println!("  <number>\t\tPush a number to the stack");
+                println!("  + a add\t\tAdd the top two numbers from the stack");
+                println!("  - s sub\t\tSubtract the top two number from the stack");
+                println!("  * x mul\t\tMultiply the top two numbers from the stack");
+                println!("  / d div\t\tDivide the top two numbers from the stack");
+                println!("  ++ aa\t\t\tSum all the stack");
+                println!("  c clear\t\tClear the stack");
+                println!("  p print\t\tDisplay the stack");
+                println!("  h help:\t\tDisplay this message");
+                println!("  q quit:\t\tQuit the program");
             }
             _ => {}
         }
