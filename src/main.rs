@@ -7,7 +7,7 @@ fn main() {
 
     let mut cli = rpncalc::RpnCalc::cli();
 
-    println!("CLI polish reverse notation calculator.");
+    println!("CLI reverse polish notation calculator.");
     println!("'help' for a list of commands");
     while cli.keep_running() {
         my_calc.process(cli.read_new_command(std::io::stdin().lock()));

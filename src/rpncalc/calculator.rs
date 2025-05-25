@@ -61,12 +61,14 @@ fn divide(c: &mut RpnCalc) {
     if c.stack.len() < 2 {
         return;
     }
-    let divisor = c.stack.pop().unwrap();
-    let dividend = c.stack.pop().unwrap();
-    if divisor == 0.0 {
+
+    if *c.stack.last().unwrap() == 0.0 {
         println!("Error: Zero division");
         return;
     }
+
+    let divisor = c.stack.pop().unwrap();
+    let dividend = c.stack.pop().unwrap();
     c.stack.push(dividend / divisor);
     print_top(c);
 }

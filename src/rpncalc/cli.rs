@@ -35,21 +35,14 @@ impl CliCmd {
         }
 
         match tokenized_command[0].to_lowercase().as_str() {
-            "+" => CliCmd::new_add_command(),
-            "a" => CliCmd::new_add_command(),
-            "-" => CliCmd::new_subtract_command(),
-            "s" => CliCmd::new_subtract_command(),
-            "*" => CliCmd::new_multiply_command(),
-            "x" => CliCmd::new_multiply_command(),
-            "/" => CliCmd::new_divide_command(),
-            "d" => CliCmd::new_divide_command(),
-            "c" => CliCmd::new_clear_command(),
-            "print" => CliCmd::new_list_command(),
-            "p" => CliCmd::new_list_command(),
-            "help" => CliCmd::new_help_command(),
-            "h" => CliCmd::new_help_command(),
-            "quit" => CliCmd::new_quit_command(),
-            "q" => CliCmd::new_quit_command(),
+            "+" | "a" | "add" => CliCmd::new_add_command(),
+            "-" | "s" | "sub" => CliCmd::new_subtract_command(),
+            "*" | "x" | "mul" => CliCmd::new_multiply_command(),
+            "/" | "d" | "div" => CliCmd::new_divide_command(),
+            "c" | "clear" => CliCmd::new_clear_command(),
+            "p" | "print" => CliCmd::new_list_command(),
+            "h" | "help" => CliCmd::new_help_command(),
+            "q" | "quit" => CliCmd::new_quit_command(),
             _ => CliCmd::new_unknown_command(),
         }
     }
@@ -130,7 +123,7 @@ impl Cli {
     pub fn new() -> Cli {
         Cli {
             keep_running: true,
-            cursor_character: '#',
+            cursor_character: '>',
         }
     }
 
@@ -139,16 +132,14 @@ impl Cli {
             CliOperation::Unknown => {
                 println!("Unknown command - 'help' for a list of commands");
             }
-            CliOperation::Quit => {
-                println!("Exiting");
-            }
+            CliOperation::Quit => {}
             CliOperation::Help => {
                 println!("Commands:");
                 println!("  <number>\tPush a number to the stack");
                 println!("  + / a\t\tAdd the top two numbers from the stack");
                 println!("  - / s\t\tSubtract the top two number from the stack");
                 println!("  * / x\t\tMultiply the top two numbers from the stack");
-                println!("  * / d\t\tDivide the top two numbers from the stack");
+                println!("  / / d\t\tDivide the top two numbers from the stack");
                 println!("  print / p\tDisplay the stack");
                 println!("  help / h:\tDisplay this message");
                 println!("  quit / q:\tQuit the program");
