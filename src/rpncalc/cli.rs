@@ -163,7 +163,7 @@ impl Cli {
                 println!("  * x mul\t\tMultiply the top two numbers from the stack");
                 println!("  / d div\t\tDivide the top two numbers from the stack");
                 println!("  ++ aa\t\t\tSum all the stack");
-                println!("  ** **\t\t\tMultiply all the stack");
+                println!("  ** xx\t\t\tMultiply all the stack");
                 println!("  c clear\t\tClear the stack");
                 println!("  p print\t\tDisplay the stack");
                 println!("  h help:\t\tDisplay this message");
