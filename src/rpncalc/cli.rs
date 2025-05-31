@@ -11,6 +11,7 @@ pub enum CliOperation {
     Multiply,
     Divide,
     AddAll,
+    MultAll,
     Clear,
     List,
     Quit,
@@ -45,6 +46,7 @@ impl CliCmd {
             "*" | "x" | "mul" => CliCmd::new_multiply_command(),
             "/" | "d" | "div" => CliCmd::new_divide_command(),
             "++" | "aa" => CliCmd::new_add_all_command(),
+            "**" | "xx" => CliCmd::new_mult_all_command(),
             "c" | "clear" => CliCmd::new_clear_command(),
             "p" | "print" => CliCmd::new_list_command(),
             "h" | "help" => CliCmd::new_help_command(),
@@ -86,6 +88,12 @@ impl CliCmd {
     fn new_add_all_command() -> CliCmd {
         CliCmd {
             oper: CliOperation::AddAll,
+        }
+    }
+
+    fn new_mult_all_command() -> CliCmd {
+        CliCmd {
+            oper: CliOperation::MultAll,
         }
     }
 
@@ -155,6 +163,7 @@ impl Cli {
                 println!("  * x mul\t\tMultiply the top two numbers from the stack");
                 println!("  / d div\t\tDivide the top two numbers from the stack");
                 println!("  ++ aa\t\t\tSum all the stack");
+                println!("  ** **\t\t\tMultiply all the stack");
                 println!("  c clear\t\tClear the stack");
                 println!("  p print\t\tDisplay the stack");
                 println!("  h help:\t\tDisplay this message");
