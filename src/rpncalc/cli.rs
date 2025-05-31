@@ -25,6 +25,10 @@ pub struct CliCmd {
 
 impl CliCmd {
     fn from_raw_command(s: String) -> CliCmd {
+        if s.is_empty() {
+            // Its a EOF, Ctrl+D string
+            return CliCmd::new_quit_command();
+        }
         let tokenized_command = s.split_whitespace().collect::<Vec<_>>();
 
         if tokenized_command.is_empty() {
@@ -140,7 +144,9 @@ impl Cli {
             CliOperation::Unknown => {
                 println!("Unknown command - 'help' for a list of commands");
             }
-            CliOperation::Quit => {}
+            CliOperation::Quit => {
+                println!("Exiting");
+            }
             CliOperation::Help => {
                 println!("Commands:");
                 println!("  <number>\t\tPush a number to the stack");

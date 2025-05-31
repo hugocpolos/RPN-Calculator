@@ -64,6 +64,21 @@ mod tests {
     }
 
     #[test]
+    fn cli_exit_calculator_using_eof() {
+        let mut cli = RpnCalc::cli();
+        assert_eq!(cli.keep_running(), true);
+        let command = std::io::Cursor::new(b"quit");
+        cli.read_new_command(command);
+        assert_eq!(cli.keep_running(), false);
+
+        let mut cli = RpnCalc::cli();
+        assert_eq!(cli.keep_running(), true);
+        let command = std::io::Cursor::new(b"");
+        cli.read_new_command(command);
+        assert_eq!(cli.keep_running(), false);
+    }
+
+    #[test]
     fn cli_push_valid_numbers() {
         let mut calc = RpnCalc::new();
         process_command(&mut calc, "0");
