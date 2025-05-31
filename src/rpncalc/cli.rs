@@ -152,8 +152,8 @@ impl Cli {
         }
     }
 
-    fn display_command_output(&self, cmd: CliOperation) {
-        match cmd {
+    fn display_command_output(&self, cmd: &CliCmd) {
+        match cmd.oper {
             CliOperation::Unknown => {
                 println!("Unknown command - 'help' for a list of commands");
             }
@@ -193,12 +193,7 @@ impl Cli {
             self.keep_running = false;
         }
 
-        match cmd.oper {
-            CliOperation::Unknown => self.display_command_output(CliOperation::Unknown),
-            CliOperation::Quit => self.display_command_output(CliOperation::Quit),
-            CliOperation::Help => self.display_command_output(CliOperation::Help),
-            _ => {}
-        }
+        self.display_command_output(&cmd);
 
         cmd
     }
