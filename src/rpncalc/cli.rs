@@ -17,6 +17,7 @@ pub enum CliOperation {
     Quit,
     Unknown,
     Help,
+    ClearScreen,
     Empty,
 }
 
@@ -51,6 +52,10 @@ impl CliCmd {
             "p" | "print" => CliCmd::new_list_command(),
             "h" | "help" => CliCmd::new_help_command(),
             "q" | "quit" => CliCmd::new_quit_command(),
+            "cls" => {
+                clear_screen();
+                CliCmd::new_empty_command()
+            }
             _ => CliCmd::new_unknown_command(),
         }
     }
@@ -167,6 +172,7 @@ impl Cli {
                 println!("  c clear\t\tClear the stack");
                 println!("  p print\t\tDisplay the stack");
                 println!("  h help:\t\tDisplay this message");
+                println!("  cls:\t\t\tClear the cli screen");
                 println!("  q quit:\t\tQuit the program");
             }
             _ => {}
@@ -212,6 +218,10 @@ impl Cli {
             .expect("Error reading command");
         raw_cmd
     }
+}
+
+fn clear_screen() {
+    print!("\x1B[2J\x1B[1;1H");
 }
 
 impl Default for Cli {
