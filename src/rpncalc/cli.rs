@@ -26,22 +26,11 @@ pub struct CliCmd {
 }
 
 impl CliCmd {
-    fn from_raw_command(s: String) -> CliCmd {
-        if s.is_empty() {
-            // Its a EOF, Ctrl+D string
-            return CliCmd::new_quit_command();
+    fn parse_individual_raw_command(s: &str) -> CliCmd {
+        if s.parse::<f64>().is_ok() {
+            return CliCmd::new_push_command(f64::from_str(&s).unwrap());
         }
-        let tokenized_command = s.split_whitespace().collect::<Vec<_>>();
-
-        if tokenized_command.is_empty() {
-            return CliCmd::new_empty_command();
-        }
-
-        if tokenized_command[0].parse::<f64>().is_ok() {
-            return CliCmd::new_push_command(f64::from_str(tokenized_command[0]).unwrap());
-        }
-
-        match tokenized_command[0].to_lowercase().as_str() {
+        match s.to_lowercase().as_str() {
             "+" | "a" | "add" => CliCmd::new_add_command(),
             "-" | "s" | "sub" => CliCmd::new_subtract_command(),
             "*" | "x" | "mul" => CliCmd::new_multiply_command(),
@@ -52,12 +41,28 @@ impl CliCmd {
             "p" | "print" => CliCmd::new_list_command(),
             "h" | "help" => CliCmd::new_help_command(),
             "q" | "quit" => CliCmd::new_quit_command(),
-            "cls" => {
-                clear_screen();
-                CliCmd::new_empty_command()
-            }
+            "cls" => CliCmd::new_clear_screen_command(),
             _ => CliCmd::new_unknown_command(),
         }
+    }
+
+    fn from_raw_command(s: String) -> Vec<CliCmd> {
+        if s.is_empty() {
+            // Its an EOF, Ctrl+D string
+            return vec![CliCmd::new_quit_command()];
+        }
+
+        let tokenized_command = s.split_whitespace().collect::<Vec<_>>();
+
+        if tokenized_command.is_empty() {
+            return vec![CliCmd::new_empty_command()];
+        }
+
+        let mut commands: Vec<CliCmd> = vec![];
+        for raw_command in tokenized_command.iter() {
+            commands.push(CliCmd::parse_individual_raw_command(raw_command));
+        }
+        return commands;
     }
 
     fn new_push_command(number: f64) -> CliCmd {
@@ -126,6 +131,12 @@ impl CliCmd {
         }
     }
 
+    fn new_clear_screen_command() -> CliCmd {
+        CliCmd {
+            oper: CliOperation::ClearScreen,
+        }
+    }
+
     fn new_unknown_command() -> CliCmd {
         CliCmd {
             oper: CliOperation::Unknown,
@@ -152,6 +163,26 @@ impl Cli {
         }
     }
 
+    fn help_message(&self) {
+        println!("Commands:");
+        println!("  <number>\t\tPush a number to the stack");
+        println!("  + a add\t\tAdd the top two numbers from the stack");
+        println!("  - s sub\t\tSubtract the top two number from the stack");
+        println!("  * x mul\t\tMultiply the top two numbers from the stack");
+        println!("  / d div\t\tDivide the top two numbers from the stack");
+        println!("  ++ aa\t\t\tSum all the stack");
+        println!("  ** xx\t\t\tMultiply all the stack");
+        println!("  c clear\t\tClear the stack");
+        println!("  p print\t\tDisplay the stack");
+        println!("  h help:\t\tDisplay this message");
+        println!("  cls:\t\t\tClear the cli screen");
+        println!("  q quit:\t\tQuit the program");
+    }
+
+    fn clear_screen(&self) {
+        print!("\x1B[2J\x1B[1;1H");
+    }
+
     fn display_command_output(&self, cmd: &CliCmd) {
         match cmd.oper {
             CliOperation::Unknown => {
@@ -160,20 +191,11 @@ impl Cli {
             CliOperation::Quit => {
                 println!("Exiting");
             }
+            CliOperation::ClearScreen => {
+                self.clear_screen();
+            }
             CliOperation::Help => {
-                println!("Commands:");
-                println!("  <number>\t\tPush a number to the stack");
-                println!("  + a add\t\tAdd the top two numbers from the stack");
-                println!("  - s sub\t\tSubtract the top two number from the stack");
-                println!("  * x mul\t\tMultiply the top two numbers from the stack");
-                println!("  / d div\t\tDivide the top two numbers from the stack");
-                println!("  ++ aa\t\t\tSum all the stack");
-                println!("  ** xx\t\t\tMultiply all the stack");
-                println!("  c clear\t\tClear the stack");
-                println!("  p print\t\tDisplay the stack");
-                println!("  h help:\t\tDisplay this message");
-                println!("  cls:\t\t\tClear the cli screen");
-                println!("  q quit:\t\tQuit the program");
+                self.help_message();
             }
             _ => {}
         }
@@ -183,19 +205,19 @@ impl Cli {
         self.keep_running
     }
 
-    pub fn read_new_command<R>(&mut self, reader: R) -> CliCmd
+    pub fn read_new_command<R>(&mut self, reader: R) -> Vec<CliCmd>
     where
         R: io::BufRead,
     {
         self.display();
-        let cmd = CliCmd::from_raw_command(self.get_raw_cmd_from_user(reader));
-        if cmd.oper == CliOperation::Quit {
+        let cmds = CliCmd::from_raw_command(self.get_raw_cmd_from_user(reader));
+        if cmds[0].oper == CliOperation::Quit {
             self.keep_running = false;
         }
 
-        self.display_command_output(&cmd);
+        self.display_command_output(&cmds[0]);
 
-        cmd
+        cmds
     }
 
     fn display(&self) {
@@ -213,10 +235,6 @@ impl Cli {
             .expect("Error reading command");
         raw_cmd
     }
-}
-
-fn clear_screen() {
-    print!("\x1B[2J\x1B[1;1H");
 }
 
 impl Default for Cli {

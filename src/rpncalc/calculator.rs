@@ -1,7 +1,7 @@
 use super::cli::{CliCmd, CliOperation};
 use super::RpnCalc;
 
-pub fn process(c: &mut RpnCalc, cmd: CliCmd) {
+pub fn process(c: &mut RpnCalc, cmd: &CliCmd) {
     match cmd.oper {
         CliOperation::Push(number) => push(c, number),
         CliOperation::Add => add(c),

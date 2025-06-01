@@ -16,8 +16,10 @@ impl RpnCalc {
         cli::Cli::new()
     }
 
-    pub fn process(&mut self, cmd: cli::CliCmd) {
-        calculator::process(self, cmd)
+    pub fn process(&mut self, cmds: Vec<cli::CliCmd>) {
+        for cmd in cmds.iter() {
+            calculator::process(self, cmd);
+        }
     }
 }
 
@@ -61,16 +63,16 @@ mod tests {
         let command = std::io::Cursor::new(b"q");
         cli.read_new_command(command);
         assert_eq!(cli.keep_running(), false);
+
+        let mut cli = RpnCalc::cli();
+        assert_eq!(cli.keep_running(), true);
+        let command = std::io::Cursor::new(b"q q q q q q q q");
+        cli.read_new_command(command);
+        assert_eq!(cli.keep_running(), false);
     }
 
     #[test]
     fn cli_exit_calculator_using_eof() {
-        let mut cli = RpnCalc::cli();
-        assert_eq!(cli.keep_running(), true);
-        let command = std::io::Cursor::new(b"quit");
-        cli.read_new_command(command);
-        assert_eq!(cli.keep_running(), false);
-
         let mut cli = RpnCalc::cli();
         assert_eq!(cli.keep_running(), true);
         let command = std::io::Cursor::new(b"");
@@ -97,6 +99,15 @@ mod tests {
             [0.0, -1.0, -1.6, 1.0, 1.9, 4.0, 10.8, -15.0, 25000.0, 1000000.0, 0.5]
         );
     }
+    #[test]
+    fn cli_single_line_push_valid_numbers() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "0 -1 -1.6 1 1.9 +4 +10.8 -1.5e1 2.5e4 +1e6 .5");
+        assert_eq!(
+            calc.stack,
+            [0.0, -1.0, -1.6, 1.0, 1.9, 4.0, 10.8, -15.0, 25000.0, 1000000.0, 0.5]
+        );
+    }
 
     #[test]
     fn cli_do_not_push_invalid_numbers() {
@@ -113,6 +124,13 @@ mod tests {
         process_command(&mut calc, "10-1");
         process_command(&mut calc, "foo");
         process_command(&mut calc, "++1");
+        assert_eq!(calc.stack, []);
+    }
+
+    #[test]
+    fn cli_single_line_mode_do_not_push_invalid_numbers() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "pi e log10 zero x xx 1,1 1e 1- 10-1 foo ++1");
         assert_eq!(calc.stack, []);
     }
 
@@ -196,6 +214,13 @@ mod tests {
     }
 
     #[test]
+    fn cli_single_line_mode_add_top_of_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1 2 3 4 5 + a A add");
+        assert_eq!(calc.stack, [15.0]);
+    }
+
+    #[test]
     fn cli_sub_operation_1() {
         let mut calc = RpnCalc::new();
         process_command(&mut calc, "1");
@@ -243,6 +268,13 @@ mod tests {
         process_command(&mut calc, "S");
         assert_eq!(calc.stack, [200.0, 70.0]);
         process_command(&mut calc, "sub");
+        assert_eq!(calc.stack, [130.0]);
+    }
+
+    #[test]
+    fn cli_single_line_mode_sub_top_of_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "200 100 50 25 5 - s S sub");
         assert_eq!(calc.stack, [130.0]);
     }
 
@@ -298,6 +330,13 @@ mod tests {
     }
 
     #[test]
+    fn cli_single_line_mode_mult_top_of_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1 2 3 4 5 * x X mul");
+        assert_eq!(calc.stack, [120.0]);
+    }
+
+    #[test]
     fn cli_div_operation_1() {
         let mut calc = RpnCalc::new();
         process_command(&mut calc, "-1e6");
@@ -349,12 +388,26 @@ mod tests {
     }
 
     #[test]
+    fn cli_single_line_mode_div_top_of_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "2048 1024 512 256 128 / d D div");
+        assert_eq!(calc.stack, [512.0]);
+    }
+
+    #[test]
     fn cli_div_zero_division() {
         let mut calc = RpnCalc::new();
         process_command(&mut calc, "10");
         process_command(&mut calc, "0");
         process_command(&mut calc, "/");
         assert_eq!(calc.stack, [10.0, 0.0]);
+    }
+
+    #[test]
+    fn cli_single_line_mode_div_zero_division() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "10 0 / 1");
+        assert_eq!(calc.stack, [10.0, 0.0, 1.0]);
     }
 
     #[test]
@@ -366,6 +419,13 @@ mod tests {
         process_command(&mut calc, "4");
         process_command(&mut calc, "5");
         process_command(&mut calc, "++");
+        assert_eq!(calc.stack, [15.0]);
+    }
+
+    #[test]
+    fn cli_single_line_mode_add_all_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1 2 3 4 5 ++");
         assert_eq!(calc.stack, [15.0]);
     }
 
@@ -423,6 +483,13 @@ mod tests {
     }
 
     #[test]
+    fn cli_single_line_mode_mult_all_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "-1 2 3 4 5 **");
+        assert_eq!(calc.stack, [-120.0]);
+    }
+
+    #[test]
     fn cli_mult_all_stack_2() {
         let mut calc = RpnCalc::new();
         process_command(&mut calc, "1");
@@ -461,5 +528,45 @@ mod tests {
         process_command(&mut calc, "1");
         process_command(&mut calc, "xx");
         assert_eq!(calc.stack, [1.0]);
+    }
+
+    #[test]
+    fn cli_single_line_mode_push_numbers_2() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "0     1               0 1");
+        assert_eq!(calc.stack, [0.0, 1.0, 0.0, 1.0]);
+    }
+
+    #[test]
+    fn cli_single_line_mode_pythagoras() {
+        //       *
+        //       * *
+        //       *   *
+        //    8  *     *  H
+        //       *       *
+        //       *         *
+        //       *           *
+        //       *************
+        //             6
+        //
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "8 8 * 6 6 * +"); //TODO: complete the test when sqrt is
+                                                     //implemented
+        let hypotenuse = calc.stack.last().unwrap();
+        assert_eq!(*hypotenuse, 100.0);
+    }
+
+    #[test]
+    fn cli_single_line_mode_clear_expression() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "0 -1 - 2 + c 1");
+        assert_eq!(calc.stack, [1.0]);
+    }
+
+    #[test]
+    fn cli_single_line_mode_multiple_operation() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "+ + - - x + a / * ++ xx");
+        assert_eq!(calc.stack, []);
     }
 }
