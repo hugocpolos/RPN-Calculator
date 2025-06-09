@@ -10,6 +10,7 @@ pub enum CliOperation {
     Subtract,
     Multiply,
     Divide,
+    SquareRoot,
     AddAll,
     MultAll,
     Clear,
@@ -35,6 +36,7 @@ impl CliCmd {
             "-" | "s" | "sub" => CliCmd::new_subtract_command(),
             "*" | "x" | "mul" => CliCmd::new_multiply_command(),
             "/" | "d" | "div" => CliCmd::new_divide_command(),
+            "sqrt" => CliCmd::new_square_root_command(),
             "++" | "aa" => CliCmd::new_add_all_command(),
             "**" | "xx" => CliCmd::new_mult_all_command(),
             "c" | "clear" => CliCmd::new_clear_command(),
@@ -92,6 +94,12 @@ impl CliCmd {
     fn new_subtract_command() -> CliCmd {
         CliCmd {
             oper: CliOperation::Subtract,
+        }
+    }
+
+    fn new_square_root_command() -> CliCmd {
+        CliCmd {
+            oper: CliOperation::SquareRoot,
         }
     }
 
@@ -170,6 +178,7 @@ impl Cli {
         println!("  - s sub\t\tSubtract the top two number from the stack");
         println!("  * x mul\t\tMultiply the top two numbers from the stack");
         println!("  / d div\t\tDivide the top two numbers from the stack");
+        println!("  sqrt\t\t\tCalculate the square root of the top of the stack");
         println!("  ++ aa\t\t\tSum all the stack");
         println!("  ** xx\t\t\tMultiply all the stack");
         println!("  c clear\t\tClear the stack");

@@ -8,6 +8,7 @@ pub fn process(c: &mut RpnCalc, cmd: &CliCmd) {
         CliOperation::Subtract => subtract(c),
         CliOperation::Multiply => multiply(c),
         CliOperation::Divide => divide(c),
+        CliOperation::SquareRoot => square_root(c),
         CliOperation::AddAll => add_all(c),
         CliOperation::MultAll => mult_all(c),
         CliOperation::Clear => clear(c),
@@ -72,6 +73,21 @@ fn divide(c: &mut RpnCalc) {
     let divisor = c.stack.pop().unwrap();
     let dividend = c.stack.pop().unwrap();
     c.stack.push(dividend / divisor);
+    print_top(c);
+}
+
+fn square_root(c: &mut RpnCalc) {
+    if c.stack.len() < 1 {
+        return;
+    }
+
+    if *c.stack.last().unwrap() < 0.0 {
+        println!("Error: Negative number square root");
+        return;
+    }
+
+    let result = c.stack.pop().unwrap().sqrt();
+    c.stack.push(result);
     print_top(c);
 }
 

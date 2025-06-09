@@ -550,10 +550,9 @@ mod tests {
         //             6
         //
         let mut calc = RpnCalc::new();
-        process_command(&mut calc, "8 8 * 6 6 * +"); //TODO: complete the test when sqrt is
-                                                     //implemented
+        process_command(&mut calc, "8 8 * 6 6 * + sqrt");
         let hypotenuse = calc.stack.last().unwrap();
-        assert_eq!(*hypotenuse, 100.0);
+        assert_eq!(*hypotenuse, 10.0);
     }
 
     #[test]
@@ -568,5 +567,62 @@ mod tests {
         let mut calc = RpnCalc::new();
         process_command(&mut calc, "+ + - - x + a / * ++ xx");
         assert_eq!(calc.stack, []);
+    }
+
+    #[test]
+    fn cli_sqrt_operation_1() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "64");
+        process_command(&mut calc, "sqrt");
+        assert_eq!(calc.stack, [8.0]);
+    }
+
+    #[test]
+    fn cli_sqrt_operation_2() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "81 sqrt sqrt");
+        assert_eq!(calc.stack, [3.0]);
+    }
+
+    #[test]
+    fn cli_sqrt_zero() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "sqrt");
+        assert_eq!(calc.stack, [0.0]);
+    }
+
+    #[test]
+    fn cli_sqrt_real() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "6.25");
+        process_command(&mut calc, "sqrt");
+        assert_eq!(calc.stack, [2.5]);
+    }
+
+    #[test]
+    fn cli_sqrt_negative() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "-9");
+        process_command(&mut calc, "sqrt");
+        assert_eq!(calc.stack, [-9.0]);
+    }
+
+    #[test]
+    fn cli_sqrt_empty_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "sqrt");
+        assert_eq!(calc.stack, []);
+    }
+
+    #[test]
+    fn cli_sqrt_on_top_of_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "100");
+        process_command(&mut calc, "100");
+        process_command(&mut calc, "100");
+        process_command(&mut calc, "100");
+        process_command(&mut calc, "sqrt");
+        assert_eq!(calc.stack, [100.0, 100.0, 100.0, 10.0]);
     }
 }
