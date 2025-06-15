@@ -625,4 +625,70 @@ mod tests {
         process_command(&mut calc, "sqrt");
         assert_eq!(calc.stack, [100.0, 100.0, 100.0, 10.0]);
     }
+
+    #[test]
+    fn cli_pow_0() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "64 0 pow");
+        assert_eq!(calc.stack, [1.0]);
+    }
+
+    #[test]
+    fn cli_pow_operation_1() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "2 3 ^");
+        assert_eq!(calc.stack, [8.0]);
+    }
+
+    #[test]
+    fn cli_pow_operation_2() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "0.5 -1");
+        process_command(&mut calc, "pow");
+        assert_eq!(calc.stack, [2.0]);
+    }
+
+    #[test]
+    fn cli_pow_operation_3() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "256 1 8 / pow");
+        assert_eq!(calc.stack, [2.0]);
+    }
+
+    #[test]
+    fn cli_pow_zero_zero() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "0");
+        process_command(&mut calc, "^");
+        assert_eq!(calc.stack, [0.0, 0.0]);
+    }
+
+    #[test]
+    fn cli_pow_single_element() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "-9");
+        process_command(&mut calc, "pow");
+        assert_eq!(calc.stack, [-9.0]);
+    }
+
+    #[test]
+    fn cli_pow_empty_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "pow");
+        assert_eq!(calc.stack, []);
+    }
+
+    #[test]
+    fn cli_pow_on_top_of_stack() {
+        let mut calc = RpnCalc::new();
+        process_command(&mut calc, "1");
+        process_command(&mut calc, "2");
+        process_command(&mut calc, "3");
+        process_command(&mut calc, "4");
+        process_command(&mut calc, "pow");
+        assert_eq!(calc.stack, [1.0, 2.0, 81.0]);
+        process_command(&mut calc, "pow ^");
+        assert_eq!(calc.stack, [1.0]);
+    }
 }

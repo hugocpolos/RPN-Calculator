@@ -9,6 +9,7 @@ pub fn process(c: &mut RpnCalc, cmd: &CliCmd) {
         CliOperation::Multiply => multiply(c),
         CliOperation::Divide => divide(c),
         CliOperation::SquareRoot => square_root(c),
+        CliOperation::Power => power(c),
         CliOperation::AddAll => add_all(c),
         CliOperation::MultAll => mult_all(c),
         CliOperation::Clear => clear(c),
@@ -88,6 +89,24 @@ fn square_root(c: &mut RpnCalc) {
 
     let result = c.stack.pop().unwrap().sqrt();
     c.stack.push(result);
+    print_top(c);
+}
+
+fn power(c: &mut RpnCalc) {
+    if c.stack.len() < 2 {
+        return;
+    }
+
+    let exponent = c.stack.pop().unwrap();
+    let base = c.stack.pop().unwrap();
+
+    if exponent == 0.0 && base == 0.0 {
+        println!("Error: 0 power 0 is undefined");
+        c.stack.push(0.0);
+        c.stack.push(0.0);
+        return;
+    }
+    c.stack.push(base.powf(exponent));
     print_top(c);
 }
 
